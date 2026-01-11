@@ -7,7 +7,7 @@ run = True
 
 while run:
     print('GAME: make your choice \nGAME: 1 - mining\nGAME: 2 - see inventory\nGAME: 3 - upgrade mine\nGAME: 4 - visit shop\nGAME: 5 - to see info\nGAME: 6 - EXIT')
-    print('GAME: 7 - crafting\n GAME: 8 - get wood\n GAME:9 - furnace')
+    print('GAME: 7 - crafting\nGAME: 8 - get wood\nGAME:9 - furnace\nGAME:10 - building')
     action = input()
     
     if action == '1':
@@ -51,3 +51,7 @@ while run:
         fuel = input('fuel? :')
         fuel_amount = int(input('how many? :'))
         modules.furnace(material= material, material_amount= material_amount, fuel= fuel, fuel_amount= fuel_amount)
+    elif action == '10':
+        building = input('what do you want to build')
+        modules.build(building)
+        

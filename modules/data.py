@@ -338,16 +338,38 @@ ALL_ITEMS = [
     'fuel_block',
 ]
 
+REQUIREMENTS_FOR_BUILDING= {
+    'house':{
+        'brick_wall': 4,
+        'door': 1,
+        'glass': 5,
+        'board': 20,
+        'torch': 5,
+        'wooden_chest':2,
+        'camp_fire':1,
+    }
+}
+
 initial_data = {
     'player': {
         'tool':'wooden_pickaxe',
         'inventory': {
             
         },
+    "workers":{
+        "inventory":{
+            
+        },
+        "tool":"",
+        "salary":5,
+        "free_workers":0
+    },
     },
     'company':{
         'name':'',
         'budget':100,
+        'people':'0',
+        'level':1
     },
     'mine':MINES[1],
 }

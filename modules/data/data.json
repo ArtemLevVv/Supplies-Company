@@ -11,9 +11,19 @@
             "peat": 10
         }
     },
+    "workers":{
+        "inventory":{
+            
+        },
+        "tool":"",
+        "salary":5,
+        "free_workers":0
+    },
     "company": {
         "name": "LevVv",
-        "budget": 99.5
+        "budget": 99.5,
+        "people":0,
+        "level":1
     },
     "mine": {
         "level": 1,

@@ -1,0 +1,99 @@
+# -------------------------
+# MacOS
+# -------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# -------------------------
+# Windows
+# -------------------------
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# -------------------------
+# Linux
+# -------------------------
+*~
+.nfs*
+
+# -------------------------
+# Python
+# -------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pycache/
+*.pytest_cache/
+*.mypy_cache/
+*.coverage
+.coverage.*
+.cache
+.pytest_cache/
+
+# -------------------------
+# Virtual Environments
+# -------------------------
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# -------------------------
+# IDEs
+# -------------------------
+# VSCode
+.vscode/
+.history/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea_modules/
+
+# Sublime
+*.sublime-project
+*.sublime-workspace
+
+# -------------------------
+# Jupyter Notebook
+# -------------------------
+.ipynb_checkpoints
+
+# -------------------------
+# Logs and temp files
+# -------------------------
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+
+# -------------------------
+# Git
+# -------------------------
+*.orig
+*.rej
+*.patch
+*.diff

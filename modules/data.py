@@ -347,15 +347,71 @@ REQUIREMENTS_FOR_BUILDING= {
         'torch': 5,
         'wooden_chest':2,
         'camp_fire':1,
+    },
+    'warehouse':{
+        'brick_wall':8,
+        'door':2,
+        'glass':8,
+        'board':30,
+        'torch':12,
+        'wooden_chest':10,
     }
 }
 
+QUESTS = {
+    'infrastructure':{
+            1:{
+                'stone':20,
+                'torch':10,
+            }
+        },
+    'social':{
+            1:{
+                'brick_wall':4,
+                'glass':2,
+                'torch':2,
+            }
+        },
+    'administrative':{
+            1:{
+                'brick_wall':4,
+                'glass':2,
+                'torch':2,
+                'wooden_chest':2,
+            }
+        },
+    'industrial':{
+            1:{
+                'handful_peat':10,
+                'coal':10,
+            }
+        },
+}
+
 initial_data = {
+    'town':{
+        'quest_id':{
+            'infrastructure':1,
+            'social':1,
+            'administrative':1,
+            'industrial':1,
+        },
+        'boost':{
+            'infrastructure':0,
+            'social':0,
+            'administrative':0,
+            'industrial':0,
+        }
+    },
+    'warehouse':{
+        'capacity': 150
+    },
     'player': {
         'tool':'wooden_pickaxe',
         'inventory': {
             
         },
+    },
     "workers":{
         "inventory":{
             
@@ -364,11 +420,10 @@ initial_data = {
         "salary":5,
         "free_workers":0
     },
-    },
     'company':{
         'name':'',
         'budget':100,
-        'people':'0',
+        'people':0,
         'level':1
     },
     'mine':MINES[1],

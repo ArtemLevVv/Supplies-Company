@@ -1,113 +1,138 @@
-from .data import change, get, save, MINES, SHOP_ITEMS, CRAFTING_RECIPES, FUEL_VALUES, FURNACE_RECIPES, REQUIREMENTS_FOR_BUILDING
+from .data import (
+    change, get, save,
+    MINES, SHOP_ITEMS,
+    CRAFTING_RECIPES,
+    FUEL_VALUES,
+    FURNACE_RECIPES,
+    REQUIREMENTS_FOR_BUILDING,
+    QUESTS,
+)
 import random
 
-def add_item(item, amount):
-    inventory = get('player', 'inventory')
+# =========================
+# INVENTORY HELPERS
+# =========================
 
-    # якщо інвентар порожній або None
-    if not inventory:
-        inventory = {}
+def get_inventory(item=None, target='player'):
+    inventory = get(target, 'inventory') or {}
+    if item is None:
+        return inventory
+    return inventory.get(item, 0)
 
-    # додаємо предмет або збільшуємо кількість
-    if item in inventory:
-        inventory[item] += int(amount)
+
+def add_item(item, amount, target='player'):
+    inventory = get_inventory(target=target)
+    inventory[item] = inventory.get(item, 0) + int(amount)
+    change(target, 'inventory', inventory)
+
+
+def remove_item(item, amount, target='player'):
+    inventory = get_inventory(target=target)
+
+    if item not in inventory:
+        print(f"No {item} in {target}'s inventory")
+        return False
+
+    if amount > inventory[item]:
+        print(f"Not enough {item}")
+        return False
+    elif amount == inventory[item]:
+        inventory.pop(item)
     else:
-        inventory[item] = int(amount)
+        inventory[item] -= amount
 
-    # зберігаємо оновлений інвентар
-    change('player', 'inventory', inventory)
+    change(target, 'inventory', inventory)
+    return True
 
-def remove_item(item: str, amount: int):
-    inventory = get('player', 'inventory') or {}
 
-    if item in inventory:
-        if amount >= inventory[item]:
-            # видаляємо предмет повністю, якщо видаляємо більше або рівно
-            inventory.pop(item)
-        else:
-            # зменшуємо кількість
-            inventory[item] -= amount
-
-        # зберігаємо оновлений інвентар
-        change('player', 'inventory', inventory)
-    else:
-        print(f"No {item} in inventory")
-
-def upgrade_mining():
-    budget = get('company', 'budget')
-    price = get('mine', 'to_upgrade')
-    mine_level = get('mine', 'level')
-    
-    if budget >= price:
-        change('mine', value=MINES[mine_level+1])
-        budget = budget-price
-        change('company', 'budget', budget)
-        price('mine was upgraded')
-    else:
-        print('not enough money')
+# =========================
+# COMPANY / GAME
+# =========================
 
 def set_company_name():
     if not get('company', 'name'):
-        name = input('how will called your SC: ')
+        name = input('How will your company be called?: ')
         change('company', 'name', name)
 
-def mining(amount_of_work=1, target='player'):
-    for _ in range(amount_of_work):
-        player_data = get(target)  # тепер target може бути 'workers'
-        mine = get('mine')
-        items = mine['item']
-        max_amount = mine['max_amount_item']
-        
-        # перевірка інструменту
-        if mine['required_tools'] == player_data.get('tool', None):
-            item = random.choice(items)
-            amount = random.randint(1, max_amount)
-            
-            # додаємо в інвентар target
-            inv = get_inventory(target=target)
-            inv[item] = inv.get(item, 0) + amount
-            change(target, 'inventory', inv)
-            
-            print(f"{amount} {item} was added to {target}'s inventory")
-
-def get_inventory(item=None, target='player'):
-    inv = get(target, 'inventory')
-    if not item:
-        return inv
-    return inv.get(item, 0)
-
-def sell_to_shop(item, amount): 
-    inventory = get('player', 'inventory') or {}
-    budget = get('company', 'budget') or 0
-    amount = int(amount)
-    if item in inventory:
-        if inventory[item] >= amount:
-            remove_item(item, amount)  # зменшуємо інвентар
-            revenue = SHOP_ITEMS[item]['sell'] * amount
-            budget += revenue
-            change('company', 'budget', budget)
-            print(f"You sold {amount}x {item} for {revenue}$")
-        else:
-            print(f"Not enough {item} to sell!")
-    else:
-        print(f"You don't have any {item} in inventory!")
-
-def buy_in_shop(item, amount):
-    inventory = get('player', 'inventory')
-    budget = get('company', 'budget')
-    
-    if budget >= float(SHOP_ITEMS[item]['buy'] * amount):
-        add_item(item, amount)
-        budget = budget - float(SHOP_ITEMS[item]['buy'] * amount)
-        change('company', 'budget', budget)
-        print(f'{item} was add to your Inventory in mount of {amount}')
-    else:
-        print("you don't have enough money")
 
 def get_info():
-    player = get('player')
-    company = get('company')
-    return player, company
+    return {
+        'player': get('player'),
+        'company': get('company'),
+        'mine': get('mine'),
+        'workers': get('workers')
+    }
+
+
+# =========================
+# MINING / WOOD
+# =========================
+
+
+
+
+
+def mining(amount_of_work=1, target='player'):
+    mine = get('mine')
+
+    for _ in range(amount_of_work):
+        entity = get(target)
+
+        tool = entity.get('tool')
+        if mine.get('required_tool') and tool != mine['required_tool']:
+            print(f"{target} has wrong tool")
+            return
+
+        item = random.choice(mine['items'])
+        amount = random.randint(1, mine['max_amount_item'])
+
+        add_item(item, amount, target)
+        print(f"{amount} {item} added to {target}")
+
+
+def deforestation(amount_of_work=1, target='player'):
+    for _ in range(amount_of_work):
+        wood = random.randint(1, 3)
+        add_item('wood', wood, target)
+        print(f"{wood} wood added to {target}")
+
+
+# =========================
+# SHOP
+# =========================
+
+def sell_to_shop(item, amount):
+    amount = int(amount)
+    inventory_amount = get_inventory(item)
+
+    if inventory_amount < amount:
+        print("Not enough items to sell")
+        return
+
+    price = SHOP_ITEMS[item]['sell'] * amount
+    remove_item(item, amount)
+    change('company', 'budget', get('company', 'budget') + price)
+
+    print(f"Sold {amount}x {item} for {price}$")
+
+
+def buy_in_shop(item, amount):
+    amount = int(amount)
+    cost = SHOP_ITEMS[item]['buy'] * amount
+    budget = get('company', 'budget')
+
+    if budget < cost:
+        print("Not enough money")
+        return
+
+    add_item(item, amount)
+    change('company', 'budget', budget - cost)
+    print(f"Bought {amount}x {item}")
+
+
+# =========================
+# CRAFTING
+# =========================
 
 def craft(item, times=1):
     recipe = CRAFTING_RECIPES.get(item)
@@ -115,125 +140,187 @@ def craft(item, times=1):
         print("No such recipe")
         return
 
-    # перевірка рівня гравця або шахти
     mine_level = get('mine', 'level')
     if recipe.get('required_level', 1) > mine_level:
-        print(f"You need mine level {recipe['required_level']} to craft {item}")
+        print("Mine level too low")
         return
 
-    # перевірка крафтінг столу
     required_table = recipe.get('required_table')
-    inventory = get('player', 'inventory') or {}
-    if required_table and required_table not in inventory:
-        print(f"You need {required_table} to craft {item}")
+    if required_table and get_inventory(required_table) == 0:
+        print(f"You need {required_table}")
         return
 
-    # перевірка інгредієнтів
     for ing, amt in recipe['ingredients'].items():
-        if inventory.get(ing, 0) < amt * times:
-            print(f"Not enough {ing} to craft {item}")
+        if get_inventory(ing) < amt * times:
+            print(f"Not enough {ing}")
             return
 
-    # віднімаємо інгредієнти
     for ing, amt in recipe['ingredients'].items():
         remove_item(ing, amt * times)
 
-    # додаємо вихідний предмет
     add_item(item, recipe['output'] * times)
-    print(f"Crafted {recipe['output'] * times}x {item}!")
+    print(f"Crafted {recipe['output'] * times}x {item}")
 
-def deforestation(amount_of_work=1, target='player'):
-    for _ in range(amount_of_work):
-        wood_amount = random.randint(1, 3)
-        
-        # отримуємо інвентар target
-        inv = get_inventory(target=target)
-        
-        # додаємо деревину
-        inv['wood'] = inv.get('wood', 0) + wood_amount
-        
-        # зберігаємо назад
-        change(target, 'inventory', inv)
-        
-        print(f"{wood_amount} wood was added to {target}'s inventory")
+
+# =========================
+# FURNACE
+# =========================
 
 def furnace(material, material_amount, fuel, fuel_amount, furnace_level=1):
+    material_amount = int(material_amount)
+    fuel_amount = int(fuel_amount)
+
     if material not in FURNACE_RECIPES:
-        print('wrong material')
+        print("Wrong material")
         return
     if fuel not in FUEL_VALUES:
-        print('wrong fuel')
+        print("Wrong fuel")
         return
-    
-    fuel_in_inventory = get_inventory(fuel)
-    
-    if fuel_in_inventory < fuel_amount:
-        print("you don't have enough in yor inventory")
+
+    recipe = FURNACE_RECIPES[material]
+
+    if furnace_level < recipe['furnace_level']:
+        print("Furnace level too low")
         return
-        
-    required_fuel = FURNACE_RECIPES[material]['fuel'] * material_amount
-    current_fuel = FUEL_VALUES[fuel] * fuel_amount
-    
-    if current_fuel < required_fuel:
-        print('not enough fuel')
+
+    required_fuel = recipe['fuel'] * material_amount
+    available_fuel = FUEL_VALUES[fuel] * fuel_amount
+
+    if available_fuel < required_fuel:
+        print("Not enough fuel power")
         return
-    if furnace_level < FURNACE_RECIPES[material]['furnace_level']:
-        print('low rank of furnace')
+
+    if get_inventory(material) < material_amount:
+        print("Not enough material")
         return
-    
+
     remove_item(material, material_amount)
     remove_item(fuel, fuel_amount)
-    
-    add_item(FURNACE_RECIPES[material]['output'], FURNACE_RECIPES[material]['output_amount'] * material_amount)
-    print(f"you get {FURNACE_RECIPES[material]['output']} x{FURNACE_RECIPES[material]['output_amount'] * material_amount}")
+
+    add_item(recipe['output'], recipe['output_amount'] * material_amount)
+    print(f"Smelted {recipe['output_amount'] * material_amount}x {recipe['output']}")
+
+
+# =========================
+# BUILDINGS / WORKERS
+# =========================
 
 def build(building):
-    keys= REQUIREMENTS_FOR_BUILDING[building].keys()
-    people = get('company', 'people')
-    level = get('company', 'level')
-    max_worker = level*5
-    if level >= 2:
-        max_worker = max_worker * 2 
-    
-    for material in keys:
-        if get_inventory(material) < REQUIREMENTS_FOR_BUILDING[building][material]:
-            print(f"you don't have enough {material}")
-            return
-        if people >= level*5:
-            print('you have max amount of worker[s], you need to upgrade company')
-            return
-        
-        remove_item(material, REQUIREMENTS_FOR_BUILDING[building][material])
-    people = people + 1
-    change('company', 'people', people)
-    print('worker was heired')
+    recipe = REQUIREMENTS_FOR_BUILDING.get(building)
+    if not recipe:
+        print("No such building")
+        return
+    if building == 'house':
+        people = get('company', 'people')
+        level = get('company', 'level')
+        max_workers = level * 5
 
-def manage_workers(task, amount_of_workers, times):
-    free_workers = get('workers', 'free_workers')
-    budget = get('company', 'budget')
+        if people >= max_workers:
+            print("Worker limit reached")
+            return
+
+        for item, amount in recipe.items():
+            if get_inventory(item) < amount:
+                print(f"Not enough {item}")
+                return
+
+        for item, amount in recipe.items():
+            remove_item(item, amount)
+
+        change('company', 'people', people + 1)
+        change('workers', 'free_workers', get('workers', 'free_workers') + 1)
+
+        print("Worker hired")
     
-    if free_workers < amount_of_workers:
+    elif building == 'warehouse':
+        for item, amount in recipe.items():
+            if get_inventory(item) < amount:
+                print(f'Not enough {item}')
+                return
+            
+        for item, amount in recipe.items():
+            remove_item(item, amount)
+        
+        capacity = get('warehouse', 'capacity')
+        
+        change('warehouse', 'capacity', capacity+100)
+
+
+def manage_workers(task, workers, times):
+    workers = int(workers)
+    times = int(times)
+
+    free = get('workers', 'free_workers')
+    budget = get('company', 'budget')
+    salary = 5 * workers * times
+
+    if free < workers:
         print("Not enough free workers")
         return
-    
-    salary = 5 * amount_of_workers * times
-    if salary > budget:
-        print(f"Not enough money, you miss {salary - budget}$")
+    if budget < salary:
+        print("Not enough money")
         return
-    
-    # виділяємо робітників
-    change('workers', 'free_workers', free_workers - amount_of_workers)
-    
-    # виконання завдання з target='workers'
-    if task == 'mining':
-        mining(amount_of_work=amount_of_workers * times, target='workers')
-    elif task == 'deforestation':
-        deforestation(amount_of_work=amount_of_workers * times, target='workers')
-    else:
-        change('workers', 'free_workers', free_workers)
-        print("Wrong task")
-        return
-    
-    change('company', 'budget', budget - salary)
-    print(f"{amount_of_workers} worker(s) finished {task} for {times} times, salary {salary}$")
 
+    change('workers', 'free_workers', free - workers)
+
+    if task == 'mining':
+        mining(workers * times, target='workers')
+    elif task == 'deforestation':
+        deforestation(workers * times, target='workers')
+    else:
+        print("Wrong task")
+        change('workers', 'free_workers', free)
+        return
+
+    change('company', 'budget', budget - salary)
+    change('workers', 'free_workers', free)
+
+    print(f"{workers} workers finished {task}, salary paid {salary}$")
+
+
+def collect_from_workers():
+    inventory = get_inventory(target='workers')
+
+    for item, amount in list(inventory.items()):
+        add_item(item, amount)
+        remove_item(item, amount, target='workers')
+
+    print("Resources collected from workers")
+
+
+def quest(type_of_quest):
+    quests = get('town', 'quest_id')
+
+    if type_of_quest not in quests:
+        print('no such quest')
+        return
+
+    quest_level = quests[type_of_quest]
+
+    if quest_level not in QUESTS[type_of_quest]:
+        print('no more quests in this category')
+        return
+
+    materials = QUESTS[type_of_quest][quest_level]
+
+    for item, amount in materials.items():
+        if get_inventory(item) < amount:
+            print(f'Not enough {item}')
+            return
+
+    for item, amount in materials.items():
+        remove_item(item, amount)
+
+    boost = get('town', 'boost')
+    boost[type_of_quest] += 1
+    change('town', 'boost', boost)
+
+    quests[type_of_quest] += 1
+    change('town', 'quest_id', quests)
+
+    print(f'{type_of_quest} quest completed!')
+
+# remaking functions in game.py
+# add functions for building warehouse 
+# add quests
+# temporarily HUD from GPT

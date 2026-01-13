@@ -57,6 +57,7 @@ def set_company_name():
 
 def get_info():
     return {
+        'town': get('town'),
         'player': get('player'),
         'company': get('company'),
         'mine': get('mine'),

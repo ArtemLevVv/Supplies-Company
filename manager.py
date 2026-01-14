@@ -181,6 +181,15 @@ def main_menu():
             input('sure!?')
             modules.sell_everything()
         
+        elif action == '12':
+            s_action = input('to you or your workers (1, 2)')
+            if s_action == '1':
+                tool = input('witch tool')
+                modules.set_tool(tool)
+            if s_action =='2':
+                tool = input('witch tool')
+                modules.set_tool_to_worker(tool)
+        
         elif action == 'q':
             show_quests()
             type_of_quest = input("Quest type to complete: ").strip().lower()

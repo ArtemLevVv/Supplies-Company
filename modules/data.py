@@ -109,6 +109,13 @@ MINES = {
     },
 }
 
+FOREST = {
+    'required_tool': 'axe',
+    'items': ['wood'],
+    'min_amount': 1,
+    'max_amount': 3,
+}
+
 SHOP_ITEMS = {
     # =========================
     # БАЗОВІ РЕСУРСИ (СТАРТ)
@@ -432,6 +439,17 @@ QUESTS = {
         },
 }
 
+TOOLS ={
+    'wooden_pickaxe':{
+        'health': 200,
+        'damage': 1,
+    },
+    'wooden_axe':{
+        'heath': 200,
+        'damage':1,
+    }
+}
+
 initial_data = {
     'town':{
         'quest_id':{
@@ -451,9 +469,10 @@ initial_data = {
         'capacity': 150
     },
     'player': {
-        'tool':{
-            'wooden_pickaxe':100
-                },
+        'tool': {
+            'wooden_pickaxe': 200,
+            'wooden_axe': 200,
+        },
         'inventory': {
             
         },

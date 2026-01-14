@@ -6,6 +6,8 @@ from .data import (
     FURNACE_RECIPES,
     REQUIREMENTS_FOR_BUILDING,
     QUESTS,
+    TOOLS,
+    FOREST,
 )
 import random
 
@@ -26,9 +28,16 @@ def get_inventory(item=None, target='player'):
 
 def add_item(item, amount, target='player'):
     try:
+        capacity = get('warehouse', 'capacity')
+        result_capacity = capacity - amount 
+        if result_capacity < 0:
+            print("you don't have room in warehouse. You need to upgrade capacity")
+            return False
+        
         inventory = get_inventory(target=target)
         inventory[item] = inventory.get(item, 0) + int(amount)
         change(target, 'inventory', inventory)
+        change('warehouse', 'capacity', result_capacity)
     except Exception as e:
         print(e)
         print('something went wrong')
@@ -37,7 +46,8 @@ def add_item(item, amount, target='player'):
 def remove_item(item, amount, target='player'):
     try:
         inventory = get_inventory(target=target)
-
+        capacity = get('warehouse', 'capacity')
+        
         if item not in inventory:
             print(f"No {item} in {target}'s inventory")
             return False
@@ -47,6 +57,7 @@ def remove_item(item, amount, target='player'):
             return False
         elif amount == inventory[item]:
             inventory.pop(item)
+            change('warehouse', 'capacity', capacity + amount)
         else:
             inventory[item] -= amount
 
@@ -55,6 +66,32 @@ def remove_item(item, amount, target='player'):
     except Exception as e:
         print(e)
         print('something went wrong')
+
+
+def set_tool(tool):
+    # перевірка що предмет є в інвентарі
+    if get_inventory(tool) <= 0:
+        print("You don't have this tool")
+        return
+
+    # перевірка що це інструмент
+    if tool not in TOOLS:
+        print("This item is not a tool")
+        return
+
+    tool_health = TOOLS[tool]['health']
+
+    tools = get('player', 'tool') or {}
+    
+    if tool in tools:
+        print('tool is already equipped')
+        return
+    
+    tools[tool] = tool_health
+    
+    change('player', 'tool', tools)
+    remove_item(tool, 1)
+    print(f"{tool} equipped")
 
 
 # =========================
@@ -88,37 +125,79 @@ def get_info():
 # MINING / WOOD
 # =========================
 
+def tool_letdown(tool, target):
+    info_tool = TOOLS[tool]
+    having_tool = get(target, 'tool')
+
+    having_tool[tool] -= info_tool['damage']
+
+    if having_tool[tool] <= 0:
+        print(f"{tool} broke!")
+        del having_tool[tool]   # ← ОСЬ ГОЛОВНЕ
+
+    change(target, 'tool', having_tool)
+
 
 def mining(amount_of_work=1, target='player'):
-    try:
-        mine = get('mine')
+    mine = get('mine')
 
-        for _ in range(amount_of_work):
-            entity = get(target)
+    for _ in range(amount_of_work):
+        entity = get(target)
+        tool = entity.get('tool')
 
-            tool = entity.get('tool')
-            if mine.get('required_tool') and tool != mine['required_tool']:
-                print(f"{target} has wrong tool")
-                return
+        if not tool:
+            print(f"{target} has no tool")
+            return
 
-            item = random.choice(mine['items'])
-            amount = random.randint(1, mine['max_amount_item'])
+        # беремо єдиний інструмент
+        tool_key, tool_value = next(iter(tool.items()))
 
-            add_item(item, amount, target)
-            print(f"{amount} {item} added to {target}")
-    except Exception as e:
-        print(e)
-        print('something went wrong')
+        # перевірка інструменту
+        required = mine.get('required_tool')
+        if required and tool_key != required:
+            print(f"{target} has wrong tool (need {required})")
+            return
+
+        # майнінг
+        item = random.choice(mine['items'])
+        amount = random.randint(1, mine['max_amount_item'])
+
+        if not add_item(item, amount, target):
+            return
+        tool_letdown(tool_key, target)
+        print(f"{amount} {item} added to {target}")
+
 
 def deforestation(amount_of_work=1, target='player'):
-    try:
-        for _ in range(amount_of_work):
-            wood = random.randint(1, 3)
-            add_item('wood', wood, target)
-            print(f"{wood} wood added to {target}")
-    except Exception as e:
-        print(e)
-        print('something went wrong')
+    entity = get(target)
+    tools = entity.get('tool', {})
+
+    if not tools:
+        print(f"{target} has no tools")
+        return
+
+    axe = None
+    for tool in tools:
+        if tool.endswith('_axe'):
+            axe = tool
+            break
+
+    if not axe:
+        print(f"{target} has no axe")
+        return
+
+    for _ in range(amount_of_work):
+        wood = random.randint(
+            FOREST['min_amount'],
+            FOREST['max_amount']
+        )
+
+        if not add_item('wood', wood, target):
+            return
+
+        tool_letdown(axe, target)
+        print(f"{wood} wood added to {target}")
+
 
 # =========================
 # SHOP
@@ -391,8 +470,3 @@ def quest(type_of_quest):
         print(e)
         print('something went wrong')
 
-# try except was added to play nonstoply with errors
-# expansions of items in shop
-# condition was added to check if worker have tool to mine of get wood 
-# possibility to sell whole inventory was added
-# 

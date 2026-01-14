@@ -107,6 +107,7 @@ def main_menu():
         print("8 - Get wood 🌲")
         print("9 - Furnace 🔥")
         print("10 - Buildings 🏠")
+        print("11 - Sell everything!!! ")
         print("Q - Quests 📜")
         print("H - Help ❔")
 
@@ -176,6 +177,10 @@ def main_menu():
             building = input("Which building to build? ")
             modules.build(building)
 
+        elif action == '11':
+            input('sure!?')
+            modules.sell_everything()
+        
         elif action == 'q':
             show_quests()
             type_of_quest = input("Quest type to complete: ").strip().lower()

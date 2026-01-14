@@ -110,45 +110,89 @@ MINES = {
 }
 
 SHOP_ITEMS = {
-    # ранній рівень (дерев'яний кайло)
+    # =========================
+    # БАЗОВІ РЕСУРСИ (СТАРТ)
+    # =========================
+    'wood': {'buy': 3, 'sell': 2},
+    'board': {'buy': 6, 'sell': 4},
+    'stick': {'buy': 2, 'sell': 1},
+    'torch': {'buy': 4, 'sell': 2},
+
     'dirt': {'buy': 1, 'sell': 0.5},
     'sand': {'buy': 2, 'sell': 1},
     'gravel': {'buy': 2, 'sell': 1},
     'clay': {'buy': 3, 'sell': 1.5},
     'stone': {'buy': 3, 'sell': 1.5},
+
+    # =========================
+    # ПАЛИВО
+    # =========================
     'coal': {'buy': 5, 'sell': 2.5},
     'peat': {'buy': 4, 'sell': 2},
+    'charcoal': {'buy': 6, 'sell': 3},
 
-    # кам'яний кайло
+    # =========================
+    # БУДІВЕЛЬНІ МАТЕРІАЛИ
+    # =========================
+    'brick': {'buy': 6, 'sell': 4},
+    'brick_wall': {'buy': 12, 'sell': 8},
+    'glass': {'buy': 8, 'sell': 5},
+
+    'wooden_chest': {'buy': 15, 'sell': 10},
+    'camp_fire': {'buy': 20, 'sell': 14},
+    'door': {'buy': 10, 'sell': 6},
+
+    # =========================
+    # РАННІ МЕТАЛИ
+    # =========================
     'copper': {'buy': 10, 'sell': 7},
     'tin': {'buy': 8, 'sell': 5},
     'zinc': {'buy': 9, 'sell': 6},
     'limestone': {'buy': 5, 'sell': 3},
 
-    # залізне кайло
+    'bronze': {'buy': 18, 'sell': 12},
+
+    # =========================
+    # СЕРЕДНІ МЕТАЛИ
+    # =========================
     'iron': {'buy': 15, 'sell': 10},
     'lead': {'buy': 12, 'sell': 8},
     'nickel': {'buy': 14, 'sell': 9},
     'sulfur': {'buy': 10, 'sell': 6},
 
-    # сталеве кайло
+    'steel': {'buy': 25, 'sell': 18},
+
+    # =========================
+    # ПРОСУНУТІ МАТЕРІАЛИ
+    # =========================
     'bauxite': {'buy': 18, 'sell': 12},
     'chromium': {'buy': 20, 'sell': 14},
     'manganese': {'buy': 16, 'sell': 11},
 
-    # електро-інструменти
     'aluminum': {'buy': 25, 'sell': 18},
-    'silicon': {'buy': 30, 'sell': 20},
-    'lithium': {'buy': 35, 'sell': 25},
-    'graphite': {'buy': 28, 'sell': 20},
 
-    # промислові
-    'uranium': {'buy': 50, 'sell': 35},
-    'thorium': {'buy': 45, 'sell': 30},
+    # =========================
+    # ЕЛЕКТРО / ХАЙ-ТЕК
+    # =========================
+    'silicon': {'buy': 30, 'sell': 20},
+    'graphite': {'buy': 28, 'sell': 20},
+    'lithium': {'buy': 35, 'sell': 25},
+
+    'battery': {'buy': 50, 'sell': 35},
+    'wire': {'buy': 12, 'sell': 8},
+    'circuit': {'buy': 80, 'sell': 55},
+
+    # =========================
+    # ПРОМИСЛОВІ
+    # =========================
     'titanium': {'buy': 55, 'sell': 40},
     'tungsten': {'buy': 60, 'sell': 45},
+    'uranium': {'buy': 50, 'sell': 35},
+    'thorium': {'buy': 45, 'sell': 30},
 
-    # хай-тек
+    # =========================
+    # ХАЙ-ТЕК / ЛЕЙТ
+    # =========================
     'platinum': {'buy': 100, 'sell': 70},
     'iridium': {'buy': 120, 'sell': 85},
     'rare_earth_elements': {'buy': 150, 'sell': 100},
@@ -407,7 +451,9 @@ initial_data = {
         'capacity': 150
     },
     'player': {
-        'tool':'wooden_pickaxe',
+        'tool':{
+            'wooden_pickaxe':100
+                },
         'inventory': {
             
         },

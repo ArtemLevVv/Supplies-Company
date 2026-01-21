@@ -1,0 +1,11 @@
+renaming
+pygame
+exe
+sprites
+
+done
+screen
+setting class
+main loop
+add requirements.txt
+add 2d version

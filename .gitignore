@@ -99,3 +99,4 @@ venv.bak/
 *.diff
 
 /modules/data/data.json
+/plans

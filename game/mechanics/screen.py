@@ -1,6 +1,6 @@
 import pygame 
 
-width = 1000
-height = 1000
+width = 1024
+height = 1024
 
 screen = pygame.display.set_mode((width, height))

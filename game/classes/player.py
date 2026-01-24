@@ -11,7 +11,7 @@ class Player(Setting):
         self.HP = hp
         self.FILE_NAME = file_name
         self.FOLDER_NAME = folder_name
-
+        self.load_image()
 
     def move_forward(self):
         self.Y -= self.STEP

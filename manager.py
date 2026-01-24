@@ -3,9 +3,9 @@ import modules, pygame, game
 game.screen.fill((100, 255, 0))
 
 modules.init_data()
+game.init_data()
 
 plyer = game.Player()
-plyer.load_image()
 
 run = True
 
@@ -22,5 +22,6 @@ while run:
         plyer.movement(keys= keys)
     game.screen.fill((100, 255, 0))
     plyer.blit_sprite(game.screen)
+    game.draw_world(['0', '01', '10', '11'], game.screen)
     pygame.display.update()
 pygame.quit()
